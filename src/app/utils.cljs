@@ -14,8 +14,8 @@
 
 ;; TODO: Try spec here
 (defn is-valid-build?
-  "Is this build record valid?"
   [x]
+  "Is this build record valid?"
       (and  (contains? x :finishedAt)
             (contains? x :startedAt)
             (is-not-nil? (:startedAt x))

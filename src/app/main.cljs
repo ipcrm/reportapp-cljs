@@ -4,6 +4,7 @@
             [clojure.string :as str]
             [re-graph.core :as re-graph]
             [app.utils :as utils]
+            [app.config :as config]
             [app.components :as comp]
             ))
 
@@ -49,6 +50,16 @@
    ;; HORROR!  subscriptions should be side-effect free
    #_(app.components/show-build-summary (:testdata db))
    (:testdata db)))                                         ;; return a query computation over the application state
+
+(rf/reg-event-fx                     ;; note: -fx
+  :testdata
+  (fn [_ _]                 ;; cofx means coeffects
+      { :redraw-summary []})) ;; returns an effect
+
+
+(rf/reg-fx         ;; <-- registration function
+  :redraw-summary   ;;  <1>
+  (fn []  app.components/show-build-summary))
 
 ;; -- Domino 5 - View Functions ----------------------------------------------
 (defn fake []
