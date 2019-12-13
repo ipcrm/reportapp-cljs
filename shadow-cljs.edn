@@ -17,4 +17,10 @@
                            :after-load app.main/run
                            :repl-init-ns app.main
                            :repl-pprint true
-                           }}}}
+                           }}
+          :node-test {:target :node-test
+                      :ns-regexp "-test$"
+                      :output-to "target/node-test.js"}
+          :karma-test {:target :karma
+                       :ns-regexp "-test$"
+                       :output-to "target/karma-test.js"}}}
