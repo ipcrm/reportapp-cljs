@@ -47,8 +47,6 @@
  :testdata
  (fn [db _]                                                 ;; db is current app state. 2nd unused param is query vector
    (println "I fired testdata!")
-   ;; HORROR!  subscriptions should be side-effect free
-   #_(app.components/show-build-summary (:testdata db))
    (:testdata db)))                                         ;; return a query computation over the application state
 
 ;; -- Domino 5 - View Functions ----------------------------------------------
@@ -102,8 +100,8 @@
    [::re-graph/init
     {
      :ws-url nil
-     :http-url "https://automation.atomist.com/graphql/team/xxxxxxx"                                           ;;TODO: Put    ;; override the http url (defaults to /graphql)
+     :http-url (app.config/get-api-url)                                           ;;TODO: Put    ;; override the http url (defaults to /graphql)
      :http-parameters {:with-credentials? false             ;; any parameters to be merged with the request, see cljs-http for options
-                       :oauth-token ""}}])                  ;; TODO: Put this in a config file
+                       :oauth-token (app.config/get-api-key)}}])                  ;; TODO: Put this in a config file
   (render))                                                 ;; mount the application's ui into '<div id="app" />'
 
