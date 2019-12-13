@@ -15,7 +15,7 @@
 (rf/reg-event-db                                            ;; sets up initial application state
  :initialize                                                ;; usage:  (dispatch [:initialize])
  (fn [_ _]                                                  ;; the two parameters are not important here, so use _
-   {:testdata "" :test "saweet"}
+   {:testdata "" :test "default data"}
    )                                                        ;; What it returns becomes the new application state
  )
 
@@ -71,7 +71,8 @@
      [:button {:type "button" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]
      [:button {:type "button" :on-click #(rf/dispatch [::re-graph/query thequery {} [:retrieve-gql-data]])} "GQL Data!"]
      ;; native react component (ratoms from a subscription will not re-render when data changes)
-     [app.components/build-summary-component chart-data]
+     [:div.summary-chart [app.components/build-summary-component chart-data]]
+     [:div.summary-text [app.components/show-build-summary-text chart-data]]
      ]))
 
 (defn test1
