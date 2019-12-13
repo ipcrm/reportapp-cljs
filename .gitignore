@@ -1,0 +1,6 @@
+node_modules
+target
+.idea
+.shadow-cljs/
+.cpcache/
+.target.old

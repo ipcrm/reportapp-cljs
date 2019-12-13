@@ -1,0 +1,20 @@
+{:deps {:aliases [:cljs]}
+ :source-paths ["src"]
+ ;:dependencies
+ ;[
+ ; [re-frame "0.10.9"]
+ ; [reagent "0.8.1"]
+ ; [re-graph "0.1.11"]
+ ; [cljsjs/chartjs "2.9.3-0"]]
+ :dev-http {8080 "target/"}
+ :builds {:app {:output-dir "target/"
+                :asset-path "."
+                :build-hooks [(shadow.html/copy-file "assets/index.html" "target/index.html")]
+                :target :browser
+                :modules {:main {:init-fn app.main/run}}
+                :source-map true
+                :devtools {
+                           :after-load app.main/run
+                           :repl-init-ns app.main
+                           :repl-pprint true
+                           }}}}
