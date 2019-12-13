@@ -21,14 +21,13 @@
             (is-not-nil? (:startedAt x))
             (is-not-nil? (:finishedAt x))
             (is-date-string-parse-able? (:startedAt x))
-            (is-date-string-parse-able? (:finishedAt x))
-      ))
+            (is-date-string-parse-able? (:finishedAt x))))
 
 (defn extract-build-info [data]
       "Extract all build-data and return it only if valid"
       (if (not (= data ""))
-        ((filter is-valid-build? (:Build (data :data)))))
-        )
+        (into [] (filter is-valid-build? (-> data :data :Build)))
+        []))
 
 (defn get-build-time
   "Get in one build element, Figure out duration"
