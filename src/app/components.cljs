@@ -53,23 +53,3 @@
          )
          ]
        ])
-
-;(defn show-build-summary
-;  []
-;  (let [
-;        new-build-data (app.utils/extract-build-info @(rf/subscribe [:testdata]))
-;        context (.getContext (.getElementById js/document "build-summary-chart") "2d")
-;        chart-data {:type "bar"
-;                    :data {:labels   ["Total" "Successful" "Failed"]
-;                           :datasets [{:data            [(count new-build-data)
-;                                                         (count (app.utils/get-success-builds new-build-data))
-;                                                         (count (app.utils/get-failed-builds new-build-data))]
-;                                       :label           "Build Data"
-;                                       :backgroundColor "#90EE90"}]}}]
-;    (print chart-data)
-;    (js/Chart. context (clj->js chart-data))
-;    ))
-
-;(defn build-summary-component
-;      []
-;  )
