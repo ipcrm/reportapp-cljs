@@ -51,16 +51,6 @@
     (println "I fired testdata!")
     (:testdata db)))                                        ;; return a query computation over the application state
 
-(rf/reg-event-fx                     ;; note: -fx
-  :testdata
-  (fn [_ _]                 ;; cofx means coeffects
-      { :redraw-summary []})) ;; returns an effect
-
-
-(rf/reg-fx         ;; <-- registration function
-  :redraw-summary   ;;  <1>
-  (fn []  app.components/show-build-summary))
-
 ;; -- Domino 5 - View Functions ----------------------------------------------
 (defn fake
       []
@@ -68,6 +58,7 @@
        [:h1 @(rf/subscribe [:test])]
        ])
 
+(def chart-data (rf/subscribe [:testdata]))
 (defn ui
       []
       [:div.foo
@@ -76,7 +67,7 @@
        [:button {:type "button" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!" ]
        [:button {:type "button" :on-click #(rf/dispatch [:clear-data])} "Clear Me!" ]
        [:button {:type "button" :on-click #(rf/dispatch [::re-graph/query thequery {} [:retrieve-gql-data]])} "GQL Data!" ]
-       [app.components/build-summary-component]
+       [app.components/chart-outer chart-data]
        [app.components/show-build-summary-text]
        ])
 
