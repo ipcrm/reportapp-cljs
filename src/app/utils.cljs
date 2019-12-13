@@ -14,8 +14,8 @@
 
 ;; TODO: Try spec here
 (defn is-valid-build?
-  "Is this build record valid?"
   [x]
+  "Is this build record valid?"
       (and  (contains? x :finishedAt)
             (contains? x :startedAt)
             (is-not-nil? (:startedAt x))
@@ -26,9 +26,8 @@
 
 (defn extract-build-info [data]
       "Extract all build-data and return it only if valid"
-      (if (not (= data ""))
-        ((filter is-valid-build? (:Build (data :data)))))
-        )
+  (if (not (= data ""))
+    (filter is-valid-build? (:Build (:data data)))))
 
 (defn get-build-time
   "Get in one build element, Figure out duration"

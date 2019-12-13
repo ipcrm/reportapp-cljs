@@ -12,17 +12,20 @@
            [:th "success"]
            [:th "fails"]]
 
-          [:tr
-           [:td (count (utils/extract-build-info @(rf/subscribe [:testdata])))]
-           [:td (count (utils/get-success-builds (utils/extract-build-info @(rf/subscribe [:testdata]))))]
-           [:td (count (utils/get-failed-builds (utils/extract-build-info @(rf/subscribe [:testdata]))))]
-           ]]
+         (if (not (= @(rf/subscribe [:testdata]) []))
+            [:tr
+             [:td (count (utils/extract-build-info @(rf/subscribe [:testdata])))]
+             [:td (count (utils/get-success-builds (utils/extract-build-info @(rf/subscribe [:testdata]))))]
+             [:td (count (utils/get-failed-builds (utils/extract-build-info @(rf/subscribe [:testdata]))))]
+             ]
+         )
+         ]
        ])
 
 (defn show-build-summary
-  [build-data]
+  []
   (let [
-        new-build-data (app.utils/extract-build-info build-data)
+        new-build-data (app.utils/extract-build-info @(rf/subscribe [:testdata]))
         context (.getContext (.getElementById js/document "build-summary-chart") "2d")
         chart-data {:type "bar"
                     :data {:labels   ["Total" "Successful" "Failed"]
@@ -38,7 +41,7 @@
 (defn build-summary-component
       []
       (reagent/create-class
-        {:component-did-mount #(show-build-summary @(rf/subscribe [:testdata]))
+        {:component-did-mount #(show-build-summary)
          :display-name        "Build Summary"
          :reagent-render      (fn []
                                   [:div.summary-chart

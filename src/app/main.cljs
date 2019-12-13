@@ -4,6 +4,7 @@
             [clojure.string :as str]
             [re-graph.core :as re-graph]
             [app.utils :as utils]
+            [app.config :as config]
             [app.components :as comp]
             ))
 
@@ -48,8 +49,17 @@
   :testdata
   (fn [db _]                                                ;; db is current app state. 2nd unused param is query vector
     (println "I fired testdata!")
-    (app.components/show-build-summary (:testdata db))
     (:testdata db)))                                        ;; return a query computation over the application state
+
+(rf/reg-event-fx                     ;; note: -fx
+  :testdata
+  (fn [_ _]                 ;; cofx means coeffects
+      { :redraw-summary []})) ;; returns an effect
+
+
+(rf/reg-fx         ;; <-- registration function
+  :redraw-summary   ;;  <1>
+  (fn []  app.components/show-build-summary))
 
 ;; -- Domino 5 - View Functions ----------------------------------------------
 (defn fake
@@ -67,8 +77,8 @@
        [:button {:type "button" :on-click #(rf/dispatch [:clear-data])} "Clear Me!" ]
        [:button {:type "button" :on-click #(rf/dispatch [::re-graph/query thequery {} [:retrieve-gql-data]])} "GQL Data!" ]
        [app.components/build-summary-component]
-        ]
-  )
+       [app.components/show-build-summary-text]
+       ])
 
 
 (defn test1
@@ -97,8 +107,8 @@
       [::re-graph/init
        {
         :ws-url                  nil
-        :http-url                ""                         ;;TODO: Put    ;; override the http url (defaults to /graphql)
+        :http-url                (config/get-api-url)                         ;;TODO: Put    ;; override the http url (defaults to /graphql)
         :http-parameters         {:with-credentials? false ;; any parameters to be merged with the request, see cljs-http for options
-                                  :oauth-token ""}}])       ;; TODO: Put this in a config file
+                                  :oauth-token (config/get-api-key)}}])       ;; TODO: Put this in a config file
     (render))                         ;; mount the application's ui into '<div id="app" />'
 
