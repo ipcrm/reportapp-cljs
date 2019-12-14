@@ -31,5 +31,3 @@
   (fn [db [_ value]]
     (assoc db :active-panel value)))
 
-(rf/dispatch
-  [:set-active-panel :panel1])
