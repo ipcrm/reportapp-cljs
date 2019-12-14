@@ -10,6 +10,11 @@
 
 (rf/reg-sub
   :testdata
-  (fn [db _]                                                 ;; db is current app state. 2nd unused param is query vector
+  (fn [db _]
     (println "I fired testdata!")
-    (:testdata db)))                                         ;; return a query computation over the application state
+    (:testdata db)))
+
+(rf/reg-sub
+  :active-panel
+  (fn [db _]
+    (:active-panel db)))

@@ -5,9 +5,9 @@
 (rf/reg-event-db                                            ;; sets up initial application state
   :initialize                                                ;; usage:  (dispatch [:initialize])
   (fn [_ _]                                                  ;; the two parameters are not important here, so use _
-    {:testdata "" :test "default data"}
-    )                                                        ;; What it returns becomes the new application state
-  )
+    {:testdata ""
+     :test "default data"
+     :active-panel :panel1}))
 
 (rf/reg-event-db
   :update-data
@@ -25,3 +25,11 @@
     (print new-data)
     (assoc db :testdata new-data))
   )
+
+(rf/reg-event-db
+  :set-active-panel
+  (fn [db [_ value]]
+    (assoc db :active-panel value)))
+
+(rf/dispatch
+  [:set-active-panel :panel1])

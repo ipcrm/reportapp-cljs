@@ -10,9 +10,7 @@
 ;; -- Entry
 (defn render
   []
-  (reagent/render [views/ui]
-                  (js/document.getElementById "app"))
-  )
+  (reagent/render [views/ui] (js/document.getElementById "app")))
 
 (defn ^:export run
   []
