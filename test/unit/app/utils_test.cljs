@@ -1,7 +1,6 @@
-(ns app.main-test
+(ns app.utils-test
   (:require
       [cljs.test :refer-macros [deftest is testing run-tests]]
-      [app.main :as main]
       [app.utils :as utils] ))
 
 (def testdata
@@ -41,22 +40,13 @@
                    :status "passed"
                    :timestamp "2019-12-04T15:11:18.294Z"}]}})
 
-(deftest test-numbers
-  (testing "simple addition test"
-    (is (= 1 1))))
-
-(deftest test1
-  (testing "test1 should add the numbers"
-    (is (= (main/test1 1 2) 3))))
-
 (deftest extract-build-info
   (testing "extract-build-info should only return valid records from the GQL output"
     (is (= (count (utils/extract-build-info testdata)) 4))))
 
 (deftest get-failed-builds
   (testing "get-failed-builds should only return records that are failed builds"
-    (is
-      (=
-        (count (app.utils/get-failed-builds (utils/extract-build-info testdata)))
-        1))
-    ))
+    (let [failed-data (utils/get-failed-builds (utils/extract-build-info testdata))]
+      (is (= (count failed-data) 1))
+      (is (= (count (filter (fn [v] (= (:status v) "failed")) failed-data)) 1))
+      )))
