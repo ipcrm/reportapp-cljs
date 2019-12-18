@@ -20,12 +20,30 @@
    [:button {:type "button" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!"]
    [:button {:type "button" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]])
 
+
+(defn query-and-notify []
+  (rf/dispatch [::re-graph/query config/thequery {} [:retrieve-gql-data]])
+  (rf/dispatch [:query-in-progress true])
+)
+
 (defn graph-panel [chart-data]
   [:div.graph-panel
-    [:button {:type "button" :on-click #(rf/dispatch [::re-graph/query config/thequery {} [:retrieve-gql-data]])} "GQL Data!"]
-    ;; native react component (ratoms from a subscription will not re-render when data changes)
-    [:div.summary-chart [comps/build-summary-component chart-data]]
-    [:div.summary-text [comps/show-build-summary-text chart-data]]])
+    (if (and (= chart-data "")
+             (= @(rf/subscribe [:query-in-progress]) false)) [:button {:type "button" :on-click query-and-notify} "Render Graphs!"])
+
+    (if (not= chart-data "")
+      (do
+        (rf/dispatch [:query-in-progress false])
+         [:div.summary-chart
+            [:button {:type "button" :on-click #(rf/dispatch [:clear-testdata])} "Clear Graphs!"]
+            [comps/build-summary-component chart-data]
+            [comps/show-build-summary-text chart-data]]))
+  ]
+)
+
+
+(defn query-running []
+  [:img {:src "https://stackoverflow.com/content/img/progress-dots.gif" :alt "Loading..."}])
 
 ;; I've moved the testdata subscription into the root component
 ;; This really is a reagent component and so it will take care of re-rendering
@@ -37,11 +55,13 @@
   (let [
         chart-data @(rf/subscribe [:testdata])
         active-panel (rf/subscribe [:active-panel])
+        query-in-progress (rf/subscribe [:query-in-progress])
         ]
     [:div.foo
      [nav-buttons active-panel]
      [:div.foo-body
       [:h1 "Hello world, it is now"]
+      (if (= @query-in-progress true) [query-running])
       (condp = @active-panel
         :panel1   [fake]
         :panel2   [graph-panel chart-data])

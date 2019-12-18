@@ -15,6 +15,12 @@
     (:testdata db)))
 
 (rf/reg-sub
+  :query-in-progress
+  (fn [db _]
+    (println "I fired query-in-progress!")
+    (:query-in-progress db)))
+
+(rf/reg-sub
   :active-panel
   (fn [db _]
     (:active-panel db)))

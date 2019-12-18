@@ -1,11 +1,5 @@
 {:deps {:aliases [:cljs]}
  :source-paths ["src"]
- ;:dependencies
- ;[
- ; [re-frame "0.10.9"]
- ; [reagent "0.8.1"]
- ; [re-graph "0.1.11"]
- ; [cljsjs/chartjs "2.9.3-0"]]
  :dev-http {8080 "target/"}
  :builds {:app {:output-dir "target/"
                 :asset-path "."
