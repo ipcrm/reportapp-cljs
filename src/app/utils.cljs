@@ -1,5 +1,8 @@
 (ns app.utils
-  (:require [re-frame.core :as rf]))
+  (:require
+     [app.config :as config]
+     [re-graph.core :as re-graph]
+     [re-frame.core :as rf]))
 
 (defn is-date-string-parse-able?
   "Can we convert this date string to a number?"
@@ -155,3 +158,7 @@
           (convert-to-chart-map (frequencies (trim-timestamps build-data)))
         ))
 
+
+(defn query-and-notify []
+  (rf/dispatch [::re-graph/query config/thequery {} [:retrieve-gql-data]])
+  (rf/dispatch [:query-in-progress true]))

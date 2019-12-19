@@ -1,49 +1,37 @@
 (ns app.views
   (:require
     [re-frame.core :as rf]
-    [app.config :as config]
-    [re-graph.core :as re-graph]
-    [app.components :as comps]))
+    [app.components :as comps]
+    ["@material-ui/core/styles" :as styles]
+    ["@material-ui/core/CssBaseline" :default CssBaseline]
+    ["@material-ui/core/AppBar" :default AppBar]
+    ["@material-ui/core/Button" :default Button]
+    ["@material-ui/core/Paper" :default Paper]
+    ["@material-ui/core/ToolBar" :default ToolBar]
+    ["@material-ui/core/Typography" :default Typography]
+    ["@material-ui/core/styles" :default Typography]
+    ["@material-ui/icons/Menu" :default MenuIcon]
+    ["@material-ui/core/IconButton" :default IconButton]
+    ["@material-ui/core/Tabs" :default Tabs]
+    ["@material-ui/core/Tab" :default Tab]
+    ))
 
 ;; -- Domino 5 - View Functions ----------------------------------------------
-(defn nav-buttons [active]
-  (print @active)
-  [:div.nav
-   [:ul
-    [:li [:a {:href "#" :on-click #(rf/dispatch [:set-active-panel :panel1]) :class (if (= @active :panel1) "active")} "Home"]]
-    [:li [:a {:href "#" :on-click #(rf/dispatch [:set-active-panel :panel2]) :class (if (= @active :panel2) "active")} "Graphs"]]
-    ]])
+(defn my-theme
+  "This is the junk theme I'm using for Material UI"
+  []
+  (styles/createMuiTheme
+    (clj->js
+      {:palette {:type      "light"
+                 :primary   {:main "#162738"}
+                 :secondary {:main "#5BD378"}}
+       :status  {:danger "orange"}}
+      )))
 
-(defn fake []
-  [:div.test
-   [:h1 @(rf/subscribe [:test])]
-   [:button {:type "button" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!"]
-   [:button {:type "button" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]])
-
-
-(defn query-and-notify []
-  (rf/dispatch [::re-graph/query config/thequery {} [:retrieve-gql-data]])
-  (rf/dispatch [:query-in-progress true])
-)
-
-(defn graph-panel [chart-data]
-  [:div.graph-panel
-    (if (and (= chart-data "")
-             (= @(rf/subscribe [:query-in-progress]) false)) [:button {:type "button" :on-click query-and-notify} "Render Graphs!"])
-
-    (if (not= chart-data "")
-      (do
-        (rf/dispatch [:query-in-progress false])
-         [:div.summary-chart
-            [:button {:type "button" :on-click #(rf/dispatch [:clear-testdata])} "Clear Graphs!"]
-            [comps/build-summary-component chart-data]
-            [comps/show-build-summary-text chart-data]]))
-  ]
-)
-
-
-(defn query-running []
-  [:img {:src "https://stackoverflow.com/content/img/progress-dots.gif" :alt "Loading..."}])
+(defn on-tab-change
+  "When a nav tab is clicked, this function sets the active panel which causes the correct panel to show"
+  [_, v]
+  (rf/dispatch [:set-active-panel v]))
 
 ;; I've moved the testdata subscription into the root component
 ;; This really is a reagent component and so it will take care of re-rendering
@@ -52,18 +40,26 @@
 ;; reagent knows that chart-data has been updated so it will re-render the build-summary-component
 ;; any time this data changes
 (defn ui []
-  (let [
-        chart-data @(rf/subscribe [:testdata])
+  (let [chart-data @(rf/subscribe [:testdata])
         active-panel (rf/subscribe [:active-panel])
-        query-in-progress (rf/subscribe [:query-in-progress])
+        query-in-progress (rf/subscribe [:query-in-progress])]
+    [:> CssBaseline
+     [:div.foo
+      [:> styles/ThemeProvider {:theme (my-theme)}
+       [:> Paper
+        [:> AppBar {:position "static"}
+         [:> Tabs {:on-change on-tab-change :value @active-panel}
+          [:> Tab {:label "Home" :id "panel1" :aria-controls "home"}]
+          [:> Tab {:label "Graphs" :id "panel2" :aria-controls "graphs"}]]]
+
+          [:div.foo-body
+           [:> Typography {:component "h1" :display "block" } "Hello world, it is now"]
+           (if (= @query-in-progress true) [comps/query-running])
+           (condp = @active-panel
+             0 [comps/fake]
+             1 [comps/graph-panel chart-data])]
         ]
-    [:div.foo
-     [nav-buttons active-panel]
-     [:div.foo-body
-      [:h1 "Hello world, it is now"]
-      (if (= @query-in-progress true) [query-running])
-      (condp = @active-panel
-        :panel1   [fake]
-        :panel2   [graph-panel chart-data])
-      ]]
+       ]
+      ]
+     ]
     ))

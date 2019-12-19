@@ -1,9 +1,12 @@
 (ns app.components
   (:require [re-frame.core :as rf]
             [reagent.core :as reagent]
-            [app.utils :as utils]))
+            [app.utils :as utils]
+            ["@material-ui/core/Typography" :default Typography]
+            ["@material-ui/core/Button" :default Button]))
 
 (defn show-build-summary-text
+  "Display a table with the build info"
   []
   (let [data (utils/extract-build-info @(rf/subscribe [:testdata]))]
     [:div.summary-text
@@ -59,3 +62,34 @@
       :component-did-update (update-build-summary chart)
       :display-name "Build Summary"
       :reagent-render (fn [] [:canvas {:id "build-summary-chart" :width "250px" :height "180px"}])})))
+
+(defn query-running
+  "Display a loading image when query is running"
+  []
+  [:img {:src "https://stackoverflow.com/content/img/progress-dots.gif" :alt "Loading..."}])
+
+(defn graph-panel [chart-data]
+  [:div.graph-panel
+   (if (and (= chart-data "")
+            (= @(rf/subscribe [:query-in-progress]) false)) [:button {:type "button" :on-click utils/query-and-notify} "Render Graphs!"])
+
+   (if (not= chart-data "")
+     (do
+       (rf/dispatch [:query-in-progress false])
+       [:div.summary-chart
+        [:button {:type "button" :on-click #(rf/dispatch [:clear-testdata])} "Clear Graphs!"]
+        [build-summary-component chart-data]
+        [show-build-summary-text chart-data]]))
+   ]
+  )
+
+(defn fake
+  "Simple component to display some dynamic text"
+  []
+  [:div.test
+   [:> Typography {:compnent "h2" :gutterBottom true} @(rf/subscribe [:test])]
+   [:> Button {:color "secondary" :variant "contained" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!"]
+   [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]])
+
+
+

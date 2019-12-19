@@ -7,7 +7,7 @@
   (fn [_ _]                                                  ;; the two parameters are not important here, so use _
     {:testdata ""
      :test "default data"
-     :active-panel :panel1
+     :active-panel 0
      :query-in-progress false}))
 
 (rf/reg-event-db
