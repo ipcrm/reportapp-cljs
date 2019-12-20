@@ -4,6 +4,7 @@
     [app.components :as comps]
     [cljss.core :as css :refer-macros [defstyles defkeyframes] :refer [inject-global]]
     ["@material-ui/core/styles" :as styles]
+    ["@material-ui/core/Container" :default Container]
     ["@material-ui/core/CssBaseline" :default CssBaseline]
     ["@material-ui/core/AppBar" :default AppBar]
     ["@material-ui/core/Button" :default Button]
@@ -32,7 +33,8 @@
 
 ;; Hacky CSS
 (inject-global {
-                :body             {:width "960px" :height "800px"}
+                :body             {:width "960px" :height "800px" :margin "0 auto 0 auto !important"}
+                ".app"            {:margin "0 auto 0 auto"}
                 ".summary-chart"  {:width "400px" :height "500px"}
                 ".summary-text"   {:float "right"}
                 ".foo"            {:width "80%" :margin "0 auto 0 auto" :padding-top "10px"}
@@ -59,21 +61,21 @@
         query-in-progress (rf/subscribe [:query-in-progress])
         ]
     [:> CssBaseline
-     [:div.foo
-      [:> styles/ThemeProvider {:theme (my-theme)}
-       [:> Paper
-        [:> AppBar {:position "static"}
-         [:> Tabs {:on-change on-tab-change :value @active-panel}
-          [:> Tab {:label "Home" :id "panel1" :aria-controls "home"}]
-          [:> Tab {:label "Graphs" :id "panel2" :aria-controls "graphs"}]]]
+      [:div.foo
+       [:> styles/ThemeProvider {:theme (my-theme)}
+        [:> Paper
+         [:> AppBar {:position "static"}
+          [:> Tabs {:on-change on-tab-change :value @active-panel}
+           [:> Tab {:label "Home" :id "panel1" :aria-controls "home"}]
+           [:> Tab {:label "Graphs" :id "panel2" :aria-controls "graphs"}]]]
 
-          [:div.foo-body
-           [:> Typography {:component "h1" :display "block" } "Hello world, it is now"]
-           (if (= @query-in-progress true) [comps/query-running])
-           (condp = @active-panel
-             0 [comps/fake]
-             1 [comps/graph-panel chart-data])]]
+         [:div.foo-body
+          [:> Typography {:component "h1" :display "block" } "Hello world, it is now"]
+          (if (= @query-in-progress true) [comps/query-running])
+          (condp = @active-panel
+            0 [comps/fake]
+            1 [comps/graph-panel chart-data])]]
+        ]
        ]
       ]
-     ]
     ))
