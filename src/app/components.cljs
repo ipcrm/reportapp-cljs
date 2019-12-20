@@ -2,8 +2,14 @@
   (:require [re-frame.core :as rf]
             [reagent.core :as reagent]
             [app.utils :as utils]
+            [cljss.core :as css :refer-macros [defstyles defkeyframes] :refer [inject-global]]
+            ["@material-ui/core/Card" :default Card]
+            ["@material-ui/core/CardContent" :default CardContent]
+            ["@material-ui/core/CardMedia" :default CardMedia]
+            ["@material-ui/core/CardActionArea" :default CardActionArea]
             ["@material-ui/core/Typography" :default Typography]
             ["@material-ui/core/Grid" :default Grid]
+            ["@material-ui/styles" :as styles]
             ["@material-ui/core/Button" :default Button]))
 
 (defn show-build-summary-text
@@ -96,3 +102,18 @@
    [:> Typography {:compnent "h2" :gutterBottom true} @(rf/subscribe [:test])]
    [:> Button {:color "secondary" :variant "contained" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!"]
    [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]])
+
+
+(defn header
+  "Card header"
+  []
+  [:> Card
+   [:> CardActionArea {}
+    [:> CardMedia {
+                   :className "header-image"
+                   :on-click #(utils/on-tab-change nil 0)
+                   :component "img"
+                   :alt       "guy"
+                   :image     "https://raw.githubusercontent.com/tallesl/Rich-Hickey-fanclub/master/cartoon/resized.png"}]
+    [:> CardContent
+     [:> Typography {:variant "h5" :component "h5" :gutterBottom true} "Matt learns CLJS"]]]])

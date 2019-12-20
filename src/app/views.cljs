@@ -14,6 +14,7 @@
     ["@material-ui/core/Typography" :default Typography]
     ["@material-ui/core/styles" :default Typography]
     ["@material-ui/icons/Menu" :default MenuIcon]
+    ["@material-ui/icons/Copyright" :default CopyIcon]
     ["@material-ui/core/IconButton" :default IconButton]
     ["@material-ui/core/Tabs" :default Tabs]
     ["@material-ui/core/Tab" :default Tab]
@@ -42,6 +43,8 @@
                 ".foo-body"       {:padding "10px" :height "100%"}
                 ".foo .nav ul li" {:float "left" :width "50px" :text-decoration "none" :list-style "none"}
                 ".active"         {:color "red" :text-decoration "none" :pointer-events "none" :cursor "default"}
+                ".header-image"   {:height "300px" :width "300px !important" :margin "0 auto 0 auto"}
+                ".vertical-middle" {:vertical-align "middle"}
                 }
   )
 
@@ -58,6 +61,7 @@
         ]
     [:> CssBaseline
       [:div.foo
+       [comps/header]
        [:> styles/ThemeProvider {:theme (my-theme)}
         [:> Paper
          [:> AppBar {:position "static"}
@@ -70,8 +74,9 @@
           (if (= @query-in-progress true) [comps/query-running])
           (condp = @active-panel
             0 [comps/fake]
-            1 [comps/graph-panel chart-data])]]
+            1 [comps/graph-panel chart-data])]
+         ]
         ]
        ]
-      ]
+      [:div.footer {:style {:text-align "right"}} [:> CopyIcon {:className "vertical-middle"}] " " (.getFullYear (js/Date.))]]
     ))

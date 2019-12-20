@@ -1,5 +1,6 @@
 (ns app.utils
   (:require
+     [jss]
      [app.config :as config]
      [re-graph.core :as re-graph]
      [re-frame.core :as rf]))
@@ -167,3 +168,12 @@
   "When a nav tab is clicked, this function sets the active panel which causes the correct panel to show"
   [_, v]
   (rf/dispatch [:set-active-panel v]))
+
+;; From https://github.com/dehli/cljss/blob/master/src/cljss/core.cljs
+(defn classes
+  [styles]
+  (js->clj
+    (.-classes
+      (.attach
+        (.createStyleSheet jss (clj->js styles))))
+    :keywordize-keys true))
