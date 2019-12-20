@@ -70,7 +70,7 @@
            [:> Tab {:label "Graphs" :id "panel2" :aria-controls "graphs"}]]]
 
          [:div.foo-body
-          [:> Typography {:component "h1" :display "block" } "Hello world, it is now"]
+          [:> Typography {:component "h1" :display "block" } "Some random text goes here"]
           (if (= @query-in-progress true) [comps/query-running])
           (condp = @active-panel
             0 [comps/fake]
