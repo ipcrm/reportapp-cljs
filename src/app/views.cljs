@@ -2,6 +2,7 @@
   (:require
     [re-frame.core :as rf]
     [app.components :as comps]
+    [app.utils :as utils]
     [cljss.core :as css :refer-macros [defstyles defkeyframes] :refer [inject-global]]
     ["@material-ui/core/styles" :as styles]
     ["@material-ui/core/Container" :default Container]
@@ -44,11 +45,6 @@
                 }
   )
 
-(defn on-tab-change
-  "When a nav tab is clicked, this function sets the active panel which causes the correct panel to show"
-  [_, v]
-  (rf/dispatch [:set-active-panel v]))
-
 ;; I've moved the testdata subscription into the root component
 ;; This really is a reagent component and so it will take care of re-rendering
 ;; any components where there props change
@@ -65,7 +61,7 @@
        [:> styles/ThemeProvider {:theme (my-theme)}
         [:> Paper
          [:> AppBar {:position "static"}
-          [:> Tabs {:on-change on-tab-change :value @active-panel}
+          [:> Tabs {:on-change utils/on-tab-change :value @active-panel}
            [:> Tab {:label "Home" :id "panel1" :aria-controls "home"}]
            [:> Tab {:label "Graphs" :id "panel2" :aria-controls "graphs"}]]]
 

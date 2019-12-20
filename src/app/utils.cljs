@@ -162,3 +162,8 @@
 (defn query-and-notify []
   (rf/dispatch [::re-graph/query config/thequery {} [:retrieve-gql-data]])
   (rf/dispatch [:query-in-progress true]))
+
+(defn on-tab-change
+  "When a nav tab is clicked, this function sets the active panel which causes the correct panel to show"
+  [_, v]
+  (rf/dispatch [:set-active-panel v]))
