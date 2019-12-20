@@ -2,6 +2,7 @@
   (:require
     [re-frame.core :as rf]
     [app.components :as comps]
+    [cljss.core :as css :refer-macros [defstyles defkeyframes] :refer [inject-global]]
     ["@material-ui/core/styles" :as styles]
     ["@material-ui/core/CssBaseline" :default CssBaseline]
     ["@material-ui/core/AppBar" :default AppBar]
@@ -17,6 +18,7 @@
     ))
 
 ;; -- Domino 5 - View Functions ----------------------------------------------
+;; Theme
 (defn my-theme
   "This is the junk theme I'm using for Material UI"
   []
@@ -27,6 +29,18 @@
                  :secondary {:main "#5BD378"}}
        :status  {:danger "orange"}}
       )))
+
+;; Hacky CSS
+(inject-global {
+                :body             {:width "960px" :height "800px"}
+                ".summary-chart"  {:width "400px" :height "500px"}
+                ".summary-text"   {:float "right"}
+                ".foo"            {:width "80%" :margin "0 auto 0 auto" :padding-top "10px"}
+                ".foo-body"       {:padding "10px" :height "100%"}
+                ".foo .nav ul li" {:float "left" :width "50px" :text-decoration "none" :list-style "none"}
+                ".active"         {:color "red" :text-decoration "none" :pointer-events "none" :cursor "default"}
+                }
+  )
 
 (defn on-tab-change
   "When a nav tab is clicked, this function sets the active panel which causes the correct panel to show"
@@ -42,7 +56,8 @@
 (defn ui []
   (let [chart-data @(rf/subscribe [:testdata])
         active-panel (rf/subscribe [:active-panel])
-        query-in-progress (rf/subscribe [:query-in-progress])]
+        query-in-progress (rf/subscribe [:query-in-progress])
+        ]
     [:> CssBaseline
      [:div.foo
       [:> styles/ThemeProvider {:theme (my-theme)}
@@ -57,8 +72,7 @@
            (if (= @query-in-progress true) [comps/query-running])
            (condp = @active-panel
              0 [comps/fake]
-             1 [comps/graph-panel chart-data])]
-        ]
+             1 [comps/graph-panel chart-data])]]
        ]
       ]
      ]

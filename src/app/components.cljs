@@ -3,6 +3,7 @@
             [reagent.core :as reagent]
             [app.utils :as utils]
             ["@material-ui/core/Typography" :default Typography]
+            ["@material-ui/core/Grid" :default Grid]
             ["@material-ui/core/Button" :default Button]))
 
 (defn show-build-summary-text
@@ -21,10 +22,10 @@
        [:td (count (utils/get-success-builds data))]
        [:td (count (utils/get-failed-builds data))]
        ]]
-     ]
-    ))
+  ]))
 
 (defn- reset-chart-data [chart build-data]
+  "Populate Chart data using GraphQL query"
   (let [context (.getContext (.getElementById js/document "build-summary-chart") "2d")
         new-build-data (app.utils/extract-build-info build-data)
         chart-data {:type "bar"
@@ -69,19 +70,21 @@
   [:img {:src "https://stackoverflow.com/content/img/progress-dots.gif" :alt "Loading..."}])
 
 (defn graph-panel [chart-data]
-  [:div.graph-panel
-   (if (and (= chart-data "")
-            (= @(rf/subscribe [:query-in-progress]) false)) [:button {:type "button" :on-click utils/query-and-notify} "Render Graphs!"])
-
+  [:> Grid {:container true :alignItems "center"}
+   (if (not= chart-data "") (rf/dispatch [:query-in-progress false]))
    (if (not= chart-data "")
-     (do
-       (rf/dispatch [:query-in-progress false])
-       [:div.summary-chart
-        [:button {:type "button" :on-click #(rf/dispatch [:clear-testdata])} "Clear Graphs!"]
-        [build-summary-component chart-data]
-        [show-build-summary-text chart-data]]))
-   ]
-  )
+     [:> Grid {:item true :md true}
+      [build-summary-component chart-data]])
+   (if (not= chart-data "")
+     [:> Grid {:item true :md true}
+      [show-build-summary-text chart-data]])
+   [:> Grid {:container true}
+      [:> Grid {:item true :xs true}
+       (if (and (= chart-data "")
+                (= @(rf/subscribe [:query-in-progress]) false))
+         [:> Button {:color "secondary" :variant "contained" :on-click utils/query-and-notify} "Render"]
+         [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-testdata])} "Clear"])]]
+   ])
 
 (defn fake
   "Simple component to display some dynamic text"
@@ -90,6 +93,3 @@
    [:> Typography {:compnent "h2" :gutterBottom true} @(rf/subscribe [:test])]
    [:> Button {:color "secondary" :variant "contained" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!"]
    [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]])
-
-
-
