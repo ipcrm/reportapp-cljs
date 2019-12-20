@@ -82,8 +82,11 @@
       [:> Grid {:item true :xs true}
        (if (and (= chart-data "")
                 (= @(rf/subscribe [:query-in-progress]) false))
-         [:> Button {:color "secondary" :variant "contained" :on-click utils/query-and-notify} "Render"]
-         [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-testdata])} "Clear"])]]
+         [:> Button {:color "secondary" :variant "contained" :on-click utils/query-and-notify} "Render"])
+
+       (if (not= chart-data "")
+         [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-testdata])} "Clear"])
+       ]]
    ])
 
 (defn fake
