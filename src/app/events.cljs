@@ -8,7 +8,9 @@
     {:testdata ""
      :test "default data"
      :active-panel 0
-     :query-in-progress false}))
+     :query-in-progress false
+     :gql-details {}
+     :gql-submitted false}))
 
 (rf/reg-event-db
   :update-data
@@ -31,9 +33,16 @@
     (assoc db :query-in-progress newdata)))
 
 (rf/reg-event-db
+  :gql-submitted
+  (fn [db [_ value]]
+    (assoc db :gql-submitted value)))
+
+(rf/reg-event-db
   :retrieve-gql-data
-  (fn [db [_ new-data]]
-    (print new-data)
+  (fn [db [f new-data]]
+    (println "FROM event")
+    (println f new-data)
+    (println "FROM event")
     (assoc db :testdata new-data))
   )
 
@@ -42,3 +51,12 @@
   (fn [db [_ value]]
     (assoc db :active-panel value)))
 
+(rf/reg-event-db
+  :set-value
+  (fn [db [_ path value]]
+    (assoc-in db (into [:gql-details] path) value)))
+
+(rf/reg-event-db
+  :update-value
+  (fn [db [_ f path value]]
+    (update-in db (into [:gql-details] path) f value)))

@@ -58,6 +58,7 @@
   (let [chart-data @(rf/subscribe [:testdata])
         active-panel (rf/subscribe [:active-panel])
         query-in-progress (rf/subscribe [:query-in-progress])
+        gql-submitted @(rf/subscribe [:gql-submitted])
         ]
     [:> CssBaseline
       [:div.foo
@@ -74,7 +75,7 @@
           (if (= @query-in-progress true) [comps/query-running])
           (condp = @active-panel
             0 [comps/fake]
-            1 [comps/graph-panel chart-data])]
+            1 [comps/graph-panel chart-data gql-submitted])]
          ]
         ]
        ]

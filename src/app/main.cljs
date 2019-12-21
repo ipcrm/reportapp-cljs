@@ -15,11 +15,6 @@
 (defn ^:export run
   []
   (rf/dispatch-sync [:initialize])
-  (rf/dispatch
-    [::re-graph/init { :ws-url nil
-      :http-url (config/get-api-url)
-      :http-parameters {:with-credentials? false
-                        :oauth-token (config/get-api-key)}}])
   (render))
 
 

@@ -24,3 +24,20 @@
   :active-panel
   (fn [db _]
     (:active-panel db)))
+
+(rf/reg-sub
+  :gql-submitted
+  (fn [db _]
+    (println "GQL Submitted" (:gql-submitted db))
+    (:gql-submitted db)))
+
+(rf/reg-sub
+  :gql-details
+  (fn [db _]
+    (:gql-details db)))
+
+(rf/reg-sub
+  :value
+  :<- [:gql-details]
+  (fn [doc [_ path]]
+    (get-in doc path)))

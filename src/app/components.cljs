@@ -1,14 +1,17 @@
 (ns app.components
   (:require [re-frame.core :as rf]
             [reagent.core :as reagent]
+            [reagent-forms.core :refer [bind-fields]]
             [app.utils :as utils]
             [cljss.core :as css :refer-macros [defstyles defkeyframes] :refer [inject-global]]
             ["@material-ui/core/Card" :default Card]
+            ["@material-ui/core/FormControl" :default FormControl]
             ["@material-ui/core/CardContent" :default CardContent]
             ["@material-ui/core/CardMedia" :default CardMedia]
             ["@material-ui/core/CardActionArea" :default CardActionArea]
             ["@material-ui/core/Typography" :default Typography]
             ["@material-ui/core/Grid" :default Grid]
+            ["@material-ui/core/TextField" :default TextField]
             ["@material-ui/styles" :as styles]
             ["@material-ui/core/Button" :default Button]))
 
@@ -75,7 +78,7 @@
   []
   [:img {:src "https://stackoverflow.com/content/img/progress-dots.gif" :alt "Loading..."}])
 
-(defn graph-panel [chart-data]
+(defn show-the-charts [chart-data]
   [:> Grid {:container true :alignItems "center"}
    (if (not= chart-data "") (rf/dispatch [:query-in-progress false]))
    (if (not= chart-data "")
@@ -85,15 +88,52 @@
      [:> Grid {:item true :md true}
       [show-build-summary-text chart-data]])
    [:> Grid {:container true}
-      [:> Grid {:item true :xs true}
-       (if (and (= chart-data "")
-                (= @(rf/subscribe [:query-in-progress]) false))
-         [:> Button {:color "secondary" :variant "contained" :on-click utils/query-and-notify} "Render"])
+    [:> Grid {:item true :xs true}
+     (if (and (= chart-data "")
+              (= @(rf/subscribe [:query-in-progress]) false))
+       [:> Button {:color "secondary" :variant "contained" :on-click utils/query-and-notify} "Render"])
 
-       (if (not= chart-data "")
-         [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-testdata])} "Clear"])
-       ]]
+     (if (not= chart-data "")
+       [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-testdata])} "Clear"])
+     ]]]
+)
+
+;; Form stuff
+(def events
+  {:get (fn [path] @(rf/subscribe [:value path]))
+   :save! (fn [path value] (rf/dispatch [:set-value path value]))
+   :update! (fn [path save-fn value]
+              (rf/dispatch [:update-value save-fn path value]))
+   :gql-details (fn [] @(rf/subscribe [:gql-details]))})
+
+(defn test-submit []
+  (rf/dispatch [:gql-submitted true])
+  (utils/query-and-notify))
+
+(defn gql-details-form
+  []
+   [bind-fields
+    [:div.form
+     [:form
+      [:input {:field :text :id :gql.url}]
+      [:input {:field :text :id :gql.token}]]
+      ]
+    events]
+  )
+
+(defn show-the-gql-details-page []
+  [:div.formouter
+   [gql-details-form]
+   [:> Button {:color "secondary" :variant "contained" :on-click test-submit} "Submit"]
    ])
+
+(defn graph-panel
+  "Show the graphs panel, but only if we have stored gql endpoint and token info"
+  [chart-data gql-submitted]
+  (println "graph pane" gql-submitted chart-data)
+    (if (true? gql-submitted)
+      (show-the-charts chart-data)
+      (show-the-gql-details-page)))
 
 (defn fake
   "Simple component to display some dynamic text"
@@ -117,3 +157,23 @@
                    :image     "https://raw.githubusercontent.com/tallesl/Rich-Hickey-fanclub/master/cartoon/resized.png"}]
     [:> CardContent
      [:> Typography {:variant "h5" :component "h5" :gutterBottom true} "Matt learns CLJS"]]]])
+
+;[:div.form
+; [:input {:field :text :id :gql.url}]
+; [:input {:field :text :id :gql.token}]
+; ]
+;[:form {:id "gql-data"}
+; [:> FormControl {:fullWidth true :margin "full"}
+;  [:> TextField {:label "GraphQL Url"} [:input {:field  :text :id :gql.url}]]
+;  [:> TextField {:label "GraphQL Token"} [:input {:field :text :id :gql.token}]]
+;  [:> Button {:color "secondary" :onClick test-submit :variant "contained"} "Submit"]
+;  ]
+
+;[bind-fields
+; [:form {:id "gql-data"}
+;  [:> FormControl {:fullWidth true }
+;   [:> TextField {:label "GraphQL Url"} [:input {:field :text :id :gql.url}]]
+;   [:> TextField {:label "GraphQL Token"} [:input {:field :text :id :gql.token}]]
+;   [:> Button {:color "secondary" :onClick test-submit :variant "contained"} "Submit"]
+;   ]]
+;  events]
