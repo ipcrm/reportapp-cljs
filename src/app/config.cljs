@@ -5,11 +5,9 @@
 (defn get-api-key
   "Return key"
   []
-  (:token (:gql @(rf/subscribe [:gql-details])))
-  )
+  (get @(rf/subscribe [:gql-details]) "token"))
 
 (defn get-api-url
   "Return URL"
   []
-  (:url (:gql @(rf/subscribe [:gql-details])))
-  )
+  (get @(rf/subscribe [:gql-details]) "url"))

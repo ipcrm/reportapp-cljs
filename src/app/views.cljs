@@ -35,12 +35,12 @@
 
 ;; Hacky CSS
 (inject-global {
-                :body             {:width "960px" :height "800px" :margin "0 auto 0 auto !important"}
+                :body             {:width "960px" :margin "0 auto 0 auto !important"}
                 ".app"            {:margin "0 auto 0 auto"}
                 ".summary-chart"  {:width "400px" :height "500px"}
                 ".summary-text"   {:float "right"}
                 ".foo"            {:width "80%" :margin "0 auto 0 auto" :padding-top "10px"}
-                ".foo-body"       {:padding "10px" :height "100%"}
+                ".foo-body"       {:padding "10px" :height "400px"}
                 ".foo .nav ul li" {:float "left" :width "50px" :text-decoration "none" :list-style "none"}
                 ".active"         {:color "red" :text-decoration "none" :pointer-events "none" :cursor "default"}
                 ".header-image"   {:height "300px" :width "300px !important" :margin "0 auto 0 auto"}
@@ -71,7 +71,6 @@
            [:> Tab {:label "Graphs" :id "panel2" :aria-controls "graphs"}]]]
 
          [:div.foo-body
-          [:> Typography {:component "h1" :display "block" } "Some random text goes here"]
           (if (= @query-in-progress true) [comps/query-running])
           (condp = @active-panel
             0 [comps/fake]

@@ -4,7 +4,9 @@
             [reagent-forms.core :refer [bind-fields]]
             [app.utils :as utils]
             [cljss.core :as css :refer-macros [defstyles defkeyframes] :refer [inject-global]]
+            ["@material-ui/core/CircularProgress" :default CircularProgress]
             ["@material-ui/core/Card" :default Card]
+            ["@material-ui/core/CardContent" :default CardContent]
             ["@material-ui/core/FormControl" :default FormControl]
             ["@material-ui/core/CardContent" :default CardContent]
             ["@material-ui/core/CardMedia" :default CardMedia]
@@ -76,7 +78,7 @@
 (defn query-running
   "Display a loading image when query is running"
   []
-  [:img {:src "https://stackoverflow.com/content/img/progress-dots.gif" :alt "Loading..."}])
+  [:> CircularProgress])
 
 (defn show-the-charts [chart-data]
   [:> Grid {:container true :alignItems "center"}
@@ -98,34 +100,32 @@
      ]]]
 )
 
-;; Form stuff
-(def events
-  {:get (fn [path] @(rf/subscribe [:value path]))
-   :save! (fn [path value] (rf/dispatch [:set-value path value]))
-   :update! (fn [path save-fn value]
-              (rf/dispatch [:update-value save-fn path value]))
-   :gql-details (fn [] @(rf/subscribe [:gql-details]))})
-
 (defn test-submit []
   (rf/dispatch [:gql-submitted true])
   (utils/query-and-notify))
 
+(defn set-gql-value [e]
+  (let [
+        value (.-value (.-target e))
+        id (.-id (.-target e))]
+    (rf/dispatch [:set-value [id] value])))
+
 (defn gql-details-form
   []
-   [bind-fields
-    [:div.form
-     [:form
-      [:input {:field :text :id :gql.url}]
-      [:input {:field :text :id :gql.token}]]
-      ]
-    events]
+  [:> Card
+   [:> CardContent
+    [:> Typography {:component "h5" :variant "h5" } "Enter the details for the GQL endpoint we should query"]
+    [:form {:id "gql-data"}
+    [:> FormControl {:fullWidth true }
+     [:> TextField {:id :url :type "url" :label "GraphQL Url" :onInput set-gql-value :onChange set-gql-value}]
+     [:> TextField {:id :token :type "password" :label "GraphQL Token" :onInput set-gql-value :onChange set-gql-value}]
+     [:> Button {:color "secondary" :onClick test-submit :variant "contained"} "Submit"]
+     ]]
+    ]]
   )
 
 (defn show-the-gql-details-page []
-  [:div.formouter
-   [gql-details-form]
-   [:> Button {:color "secondary" :variant "contained" :on-click test-submit} "Submit"]
-   ])
+   [gql-details-form])
 
 (defn graph-panel
   "Show the graphs panel, but only if we have stored gql endpoint and token info"
@@ -139,9 +139,13 @@
   "Simple component to display some dynamic text"
   []
   [:div.test
-   [:> Typography {:compnent "h2" :gutterBottom true} @(rf/subscribe [:test])]
-   [:> Button {:color "secondary" :variant "contained" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!"]
-   [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]])
+   [:> Card
+    [:> CardContent
+     [:> Typography {:component "h5" :variant "h5" :gutterBottom true } "Example text generation"]
+      [:> Typography {:compnent "h2" :gutterBottom true} @(rf/subscribe [:test])]]]
+     [:> Button {:color "secondary" :variant "contained" :on-click #(rf/dispatch [:update-data "newdatagoeshere"])} "Click Me!"]
+     [:> Button {:color "primary" :variant "contained" :on-click #(rf/dispatch [:clear-data])} "Clear Me!"]
+   ])
 
 
 (defn header
@@ -158,22 +162,3 @@
     [:> CardContent
      [:> Typography {:variant "h5" :component "h5" :gutterBottom true} "Matt learns CLJS"]]]])
 
-;[:div.form
-; [:input {:field :text :id :gql.url}]
-; [:input {:field :text :id :gql.token}]
-; ]
-;[:form {:id "gql-data"}
-; [:> FormControl {:fullWidth true :margin "full"}
-;  [:> TextField {:label "GraphQL Url"} [:input {:field  :text :id :gql.url}]]
-;  [:> TextField {:label "GraphQL Token"} [:input {:field :text :id :gql.token}]]
-;  [:> Button {:color "secondary" :onClick test-submit :variant "contained"} "Submit"]
-;  ]
-
-;[bind-fields
-; [:form {:id "gql-data"}
-;  [:> FormControl {:fullWidth true }
-;   [:> TextField {:label "GraphQL Url"} [:input {:field :text :id :gql.url}]]
-;   [:> TextField {:label "GraphQL Token"} [:input {:field :text :id :gql.token}]]
-;   [:> Button {:color "secondary" :onClick test-submit :variant "contained"} "Submit"]
-;   ]]
-;  events]

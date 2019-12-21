@@ -39,10 +39,7 @@
 
 (rf/reg-event-db
   :retrieve-gql-data
-  (fn [db [f new-data]]
-    (println "FROM event")
-    (println f new-data)
-    (println "FROM event")
+  (fn [db [_ new-data]]
     (assoc db :testdata new-data))
   )
 
