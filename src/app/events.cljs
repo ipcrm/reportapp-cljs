@@ -100,7 +100,6 @@
   :graphql-some-stuff
   [(rf/inject-cofx :gql-url) (rf/inject-cofx :gql-token)]
   (fn [cofx _]
-    (print cofx)
     {:graphql [{:query config/thequery
                 :url (:gql-url cofx)
                 :token (:gql-token cofx)
