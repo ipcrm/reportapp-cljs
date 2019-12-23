@@ -1,8 +1,6 @@
 (ns app.main
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
-            [re-graph.core :as re-graph]
-            [app.config :as config]
             [app.events]
             [app.subs]
             [app.views :as views]))

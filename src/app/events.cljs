@@ -1,5 +1,10 @@
 (ns app.events
   (:require
+    [camel-snake-kebab.core :as csk]
+    [day8.re-frame.http-fx :as http-fx]
+    [medley.core :as medley]
+    [app.config :as config]
+    [ajax.core :as ajax]
     [re-frame.core :as rf]))
 ;; -- Domino 2 - Event Handlers -----------------------------------------------
 (rf/reg-event-db                                            ;; sets up initial application state
@@ -57,3 +62,68 @@
   :update-value
   (fn [db [_ f path value]]
     (update-in db (into [:gql-details] path) f value)))
+
+(rf/reg-event-fx
+  ::graphql-fx-success
+  (fn [_ [_ event response]]
+    {:dispatch (conj event (update response :extensions #(medley/map-keys csk/->kebab-case %)))}))
+
+(rf/reg-event-fx
+  ::graphql-fx-failure
+  (fn [_ [_ event response]]
+    (when event
+      {:dispatch (conj event response)})))
+
+(defn ->request-map
+  [{:keys [query variables on-success on-failure url token] :as request}]
+  (print "TOKEN" token)
+  {:method          :post
+   :uri             url
+   :headers         {"Authorization" (str "Bearer" " " token)} ;; Probably better ways to concat strings
+   :params          (cond-> {:query query}
+                            variables (assoc :variables variables))
+   :format          (ajax/json-request-format)
+   :response-format (ajax/json-response-format {:keywords? true})
+   :on-success      [::graphql-fx-success on-success]
+   :on-failure      [::graphql-fx-failure on-failure]})
+
+(defn graphql-effect
+  [request]
+  (let [seq-graphql-maps (if (sequential? request) request [request])]
+    (http-fx/http-effect (map ->request-map seq-graphql-maps))))
+
+(rf/reg-fx
+  :graphql
+  graphql-effect)
+
+(rf/reg-event-fx
+  :graphql-some-stuff
+  [(rf/inject-cofx :gql-url) (rf/inject-cofx :gql-token)]
+  (fn [cofx _]
+    (print cofx)
+    {:graphql [{:query config/thequery
+                :url (:gql-url cofx)
+                :token (:gql-token cofx)
+                :on-success [::graphql-some-stuff-success]
+                :on-failure [::graphql-some-stuff-failure]
+                }]}))
+
+(rf/reg-event-fx
+  ::graphql-some-stuff-success
+  (fn [_ [_ response]]
+    (rf/dispatch [:retrieve-gql-data response])))
+
+(rf/reg-event-fx
+  ::graphql-some-stuff-failure
+  (fn [_ [_ response]]
+    (println "failure" response)))
+
+(rf/reg-cofx
+  :gql-url
+  (fn [cofx _]
+    (assoc cofx :gql-url (get @(rf/subscribe [:gql-details]) "url"))))
+
+(rf/reg-cofx
+  :gql-token
+  (fn [cofx _]
+    (assoc cofx :gql-token (get @(rf/subscribe [:gql-details]) "token"))))

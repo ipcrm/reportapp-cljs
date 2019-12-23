@@ -1,8 +1,6 @@
 (ns app.utils
   (:require
      [jss]
-     [app.config :as config]
-     [re-graph.core :as re-graph]
      [re-frame.core :as rf]))
 
 (defn is-date-string-parse-able?
@@ -161,13 +159,9 @@
 
 
 (defn query-and-notify []
-  (rf/dispatch-sync
-    [::re-graph/init { :ws-url nil
-                      :http-url (config/get-api-url)
-                      :http-parameters {:with-credentials? false
-                                        :oauth-token (config/get-api-key)}}])
+  (rf/dispatch [:graphql-some-stuff])
   (rf/dispatch [:query-in-progress true])
-  (rf/dispatch [::re-graph/query config/thequery {} [:retrieve-gql-data]]))
+)
 
 (defn on-tab-change
   "When a nav tab is clicked, this function sets the active panel which causes the correct panel to show"
