@@ -1,5 +1,6 @@
 (ns app.utils
   (:require
+     [app.events :as events]
      [jss]
      [re-frame.core :as rf]))
 
@@ -159,7 +160,7 @@
 
 
 (defn query-and-notify []
-  (rf/dispatch [:graphql-some-stuff])
+  (rf/dispatch [::events/graphql-some-stuff])
   (rf/dispatch [:query-in-progress true])
 )
 

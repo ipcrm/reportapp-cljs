@@ -97,7 +97,7 @@
   graphql-effect)
 
 (rf/reg-event-fx
-  :graphql-some-stuff
+  ::graphql-some-stuff
   [(rf/inject-cofx :gql-url) (rf/inject-cofx :gql-token)]
   (fn [cofx _]
     {:graphql [{:query config/thequery
